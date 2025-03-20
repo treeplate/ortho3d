@@ -70,9 +70,11 @@ class _ExampleAppState extends State<ExampleApp>
 
       int newX = rectPtr.ref.left + rectPtr.ref.right ~/ 2;
       int newY = rectPtr.ref.top + rectPtr.ref.bottom ~/ 2;
-      angle.y -= (newX - pointPtr.ref.x) / 100;
-      angle.x =
-          clampDouble(angle.x + (newY - pointPtr.ref.y) / 100, -pi / 2, pi / 2);
+      setState(() {
+        angle.y -= (newX - pointPtr.ref.x) / 100;
+        angle.x = clampDouble(
+            angle.x + (newY - pointPtr.ref.y) / 100, -pi / 2, pi / 2);
+      });
       SetCursorPos(newX, newY);
     }
     malloc.free(rectPtr);
