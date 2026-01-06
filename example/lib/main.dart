@@ -1,12 +1,10 @@
-import 'dart:ffi';
+import 'dart:js_interop';
 import 'dart:math';
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:ortho3d/ortho3d.dart';
-import 'package:win32/win32.dart';
+import 'package:web/web.dart';
 
 void main() {
   runApp(const ExampleApp());
@@ -22,8 +20,7 @@ List<Triangle> square(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Color color) {
   return [(a: a, b: b, c: d, color: color), (a: c, b: b, c: d, color: color)];
 }
 
-class _ExampleAppState extends State<ExampleApp>
-    with SingleTickerProviderStateMixin {
+class _ExampleAppState extends State<ExampleApp> {
   Vector3 angle = Vector3(0, 0, 0);
   Vector3 position = Vector3(0, 0, 0);
   static const double triangleDistance = 2;
@@ -52,46 +49,27 @@ class _ExampleAppState extends State<ExampleApp>
     ...square(p111, p101, p100, p110, Color(0xff00ffff)), // 01
   ];
 
-  late final Ticker ticker;
-  @override
-  void initState() {
-    createTicker(tick).start();
-    super.initState();
-  }
-
-  void tick(Duration d) {
-    int window = GetForegroundWindow();
-    Pointer<RECT> rectPtr = malloc.allocate<RECT>(sizeOf<RECT>());
-    if (GetWindowRect(window, rectPtr) == 0) {
-      print('error: ${GetLastError()}');
-    } else {
-      Pointer<POINT> pointPtr = malloc.allocate<POINT>(sizeOf<POINT>());
-      GetCursorPos(pointPtr);
-
-      int newX = rectPtr.ref.left + rectPtr.ref.right ~/ 2;
-      int newY = rectPtr.ref.top + rectPtr.ref.bottom ~/ 2;
-      setState(() {
-        angle.y -= (newX - pointPtr.ref.x) / 100;
-        angle.x = clampDouble(
-            angle.x + (newY - pointPtr.ref.y) / 100, -pi / 2, pi / 2);
-      });
-      SetCursorPos(newX, newY);
-    }
-    malloc.free(rectPtr);
-  }
-
-  @override
-  void dispose() {
-    ticker.dispose();
-    super.dispose();
+  void onMouseMove(MouseEvent mouseEvent) {
+    setState(() {
+      angle.y -= mouseEvent.movementX / 100;
+      angle.x =
+          clampDouble(angle.x + mouseEvent.movementY / 100, -pi / 2, pi / 2);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return TrianglesRenderer3D(
-      triangles: triangles,
-      angle: angle,
-      position: position,
+    return GestureDetector(
+      onTap: () {
+        document.body!.requestPointerLock().toDart.then((value) {
+          document.onmousemove = onMouseMove.toJS;
+        });
+      },
+      child: TrianglesRenderer3D(
+        triangles: triangles,
+        angle: angle,
+        position: position,
+      ),
     );
   }
 }
