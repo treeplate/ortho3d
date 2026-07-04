@@ -78,6 +78,7 @@ class _PointPainter extends CustomPainter {
         (vector.x + 1) * size.width / 2, (vector.y + 1) * size.height / 2);
     for (Triangle triangle in newTriangles) {
       if (!triangleOnScreen(triangle)) continue;
+      // TODO: draw all the triangles using one call to drawVertices
       canvas.drawVertices(
         Vertices(VertexMode.triangles, [
           vector3ToOffset(triangle.a),
