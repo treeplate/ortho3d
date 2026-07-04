@@ -2,8 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'package:vector_math/vector_math.dart';
-export 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math_64.dart' as vector;
+
+import 'triangle_above_square.dart';
+export 'package:vector_math/vector_math_64.dart';
 
 /// This class renders triangles using an orthographic renderer with a width of 2 units.
 class TrianglesRenderer3D extends StatelessWidget {
@@ -53,18 +56,28 @@ class _PointPainter extends CustomPainter {
       ));
     }
     newTriangles.sort((a, b) {
-      if (a.a.z != b.a.z) {
+      vector.Triangle vectorTriangleB = vector.Triangle.points(b.a, b.b, b.c);
+      if (Ray.originDirection(Vector3(a.a.x, a.a.y, 0), Vector3(0, 0, 1))
+              .intersectsWithTriangle(vectorTriangleB) !=
+          null) {
         return a.a.z.compareTo(b.a.z);
       }
-      if (a.b.z != b.b.z) {
+      if (Ray.originDirection(Vector3(a.b.x, a.b.y, 0), Vector3(0, 0, 1))
+              .intersectsWithTriangle(vectorTriangleB) !=
+          null) {
         return a.b.z.compareTo(b.b.z);
       }
-      return a.c.z.compareTo(b.c.z);
+      if (Ray.originDirection(Vector3(a.c.x, a.c.y, 0), Vector3(0, 0, 1))
+              .intersectsWithTriangle(vectorTriangleB) !=
+          null) {
+        return a.c.z.compareTo(b.c.z);
+      }
+      return 0;
     });
     Offset vector3ToOffset(Vector3 vector) => Offset(
         (vector.x + 1) * size.width / 2, (vector.y + 1) * size.height / 2);
     for (Triangle triangle in newTriangles) {
-      if (triangle.a.z < 0 && triangle.b.z < 0 && triangle.c.z < 0) continue;
+      if (!triangleOnScreen(triangle)) continue;
       canvas.drawVertices(
         Vertices(VertexMode.triangles, [
           vector3ToOffset(triangle.a),
@@ -102,4 +115,10 @@ Vector3 rotatePoint(Vector3 point, Vector3 angle) {
   Vector3 result = point.xyz;
   result.applyMatrix3(rotation);
   return result;
+}
+// is the triangle in front of the camera?
+bool triangleOnScreen(Triangle triangle) {
+  if (triangle.a.z >= 0 && triangle.b.z >= 0 && triangle.c.z >= 0) return true;
+  double screenRadius = 1;
+  return isTriangleAboveSquare([triangle.a, triangle.b, triangle.c], screenRadius);
 }

@@ -47,6 +47,18 @@ class _ExampleAppState extends State<ExampleApp> {
     ...square(p111, p011, p010, p110, Color(0xffff00ff)), // 11
     ...square(p111, p101, p001, p011, Color(0xffffff00)), // 21
     ...square(p111, p101, p100, p110, Color(0xff00ffff)), // 01
+     ...square(Vector3(-1.5, -1.5, -1.5), Vector3(-1.5, -1.5, -2),
+         Vector3(-1.5, -2, -2), Vector3(-1.5, -2, -1.5), Color(0xffffff00)),
+     ...square(Vector3(-1.5, -1.5, -1.5), Vector3(-1.5, -2, -1.5),
+         Vector3(-2, -2, -1.5), Vector3(-2, -1.5, -1.5), Color(0xffff00ff)),
+     ...square(Vector3(-1.5, -1.5, -1.5), Vector3(-2, -1.5, -1.5),
+         Vector3(-2, -1.5, -2), Vector3(-1.5, -1.5, -2), Color(0xff00ffff)),
+     ...square(Vector3(1.5, 1.5, 1.5), Vector3(1.5, 1.5, 2),
+         Vector3(1.5, 2, 2), Vector3(1.5, 2, 1.5), Color(0xffff0000)),
+     ...square(Vector3(1.5, 1.5, 1.5), Vector3(1.5, 2, 1.5),
+         Vector3(2, 2, 1.5), Vector3(2, 1.5, 1.5), Color(0xff00ff00)),
+     ...square(Vector3(1.5, 1.5, 1.5), Vector3(2, 1.5, 1.5),
+         Vector3(2, 1.5, 2), Vector3(1.5, 1.5, 2), Color(0xff0000ff)),
   ];
 
   void onMouseMove(MouseEvent mouseEvent) {
